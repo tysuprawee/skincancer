@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "PowerShell(pip install weasyprint 2>&1)",
+      "PowerShell(pip install markdown 2>&1)"
+    ]
+  }
+}
