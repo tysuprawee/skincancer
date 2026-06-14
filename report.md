@@ -12,11 +12,11 @@
 
 Skin cancer is among the most prevalent cancers worldwide. In the United States alone, more than 5 million cases of skin cancer are diagnosed each year. Of all skin cancer subtypes, **melanoma** is the most lethal, responsible for the majority of skin cancer-related deaths despite representing only about 1% of all cases. However, when detected early (stage I), the five-year survival rate exceeds 98%. When detected at stage IV, that figure drops to approximately 23%.
 
-Early detection is therefore the single most important factor in improving patient outcomes. Dermatoscopy -- a non-invasive imaging technique that uses polarized light to visualize sub-surface skin structures -- has become a standard clinical tool for evaluating pigmented skin lesions. It provides significantly more diagnostic accuracy than naked-eye examination alone.
+Early detection is therefore the single most important factor in improving patient outcomes. Dermatoscopy is a non-invasive imaging technique that uses polarized light to visualize sub-surface skin structures and has become a standard clinical tool for evaluating pigmented skin lesions. It provides significantly more diagnostic accuracy than naked-eye examination alone.
 
 Beyond image analysis, **clinical metadata** such as patient age, sex, and lesion location carries meaningful diagnostic context. Certain lesion types are known to have demographic and anatomical preferences. Melanoma, for example, is more common in older patients and tends to appear on sun-exposed areas such as the back and trunk. Basal cell carcinoma frequently develops on the face, neck, and scalp. Understanding these patterns can help clinicians prioritize which patients require closer evaluation.
 
-This project uses the HAM10000 dataset to explore these clinical and demographic patterns through data analysis, statistical hypothesis testing, and simple machine learning -- without relying on image data. The goal is to understand how metadata alone reflects the biology of skin lesions.
+This project uses the HAM10000 dataset to explore these clinical and demographic patterns through data analysis, statistical hypothesis testing, and simple machine learning without relying on image data. The goal is to understand how metadata alone reflects the biology of skin lesions.
 
 ---
 
@@ -32,7 +32,7 @@ The **HAM10000** dataset (*Human Against Machine with 10,000 training images*) w
 |--------|------|-------------|
 | `lesion_id` | String | Unique identifier for a lesion (one lesion may have multiple images) |
 | `image_id` | String | Unique identifier for each image |
-| `dx` | Categorical | Diagnosis code -- one of 7 classes |
+| `dx` | Categorical | Diagnosis code (one of 7 classes) |
 | `dx_type` | Categorical | Method used to confirm the diagnosis |
 | `age` | Numeric | Patient age in years |
 | `sex` | Categorical | Patient sex (male / female / unknown) |
@@ -54,7 +54,7 @@ The **HAM10000** dataset (*Human Against Machine with 10,000 training images*) w
 
 | Code | Method |
 |------|--------|
-| `histo` | Histopathology (tissue biopsy -- gold standard) |
+| `histo` | Histopathology (tissue biopsy, gold standard) |
 | `follow_up` | Clinical follow-up observation |
 | `consensus` | Expert dermatologist consensus |
 | `confocal` | Reflectance confocal microscopy |
@@ -149,7 +149,7 @@ A binary classification task was defined to predict **melanoma vs non-melanoma**
 - **Preprocessing:** StandardScaler for age; OneHotEncoder for sex and localization
 - **Models:** Logistic Regression, Decision Tree (max depth 5), Random Forest (100 trees)
 - **Class imbalance handling:** `class_weight='balanced'` applied to all models
-- **Key metric:** Recall for the melanoma class -- failing to detect a melanoma carries far higher clinical cost than a false alarm
+- **Key metric:** Recall for the melanoma class, since failing to detect a melanoma carries far higher clinical cost than a false alarm
 
 ---
 
@@ -174,13 +174,13 @@ Dermatofibroma shows a noticeably higher proportion in female patients, consiste
 
 ### 5.3 Body Localization Patterns
 
-The `back` and `lower extremity` are the most common overall sites. The heatmap reveals that melanoma has elevated proportions at the `back` and `trunk`, while actinic keratosis and BCC appear more frequently at the `face` and `scalp` -- sun-exposed regions consistent with UV-related etiology. Dermatofibroma is strongly associated with the `lower extremity`.
+The `back` and `lower extremity` are the most common overall sites. The heatmap reveals that melanoma has elevated proportions at the `back` and `trunk`, while actinic keratosis and BCC appear more frequently at the `face` and `scalp`, sun-exposed regions consistent with UV-related etiology. Dermatofibroma is strongly associated with the `lower extremity`.
 
 ![Figure 5: Diagnosis Count by Top-7 Body Localizations](figures/fig5_diagnosis_by_location.png)
 *Figure 5: Diagnosis Count by Top-7 Body Localizations*
 
-![Figure 6: Heatmap - Diagnosis x Body Localization](figures/fig6_heatmap_dx_location.png)
-*Figure 6: Heatmap - Diagnosis x Body Localization (%)*
+![Figure 6: Heatmap: Diagnosis x Body Localization](figures/fig6_heatmap_dx_location.png)
+*Figure 6: Heatmap: Diagnosis x Body Localization (%)*
 
 ### 5.4 Diagnosis Confirmation Method
 
@@ -191,16 +191,16 @@ Melanoma and BCC have the highest proportion of histopathologic confirmation (`h
 
 ### 5.5 Statistical Analysis Results
 
-**Test 1 -- dx vs sex (Chi-square):**
+**Test 1: dx vs sex (Chi-square)**
 The Chi-square test yielded a statistically significant result (p < 0.05), indicating that lesion type is significantly associated with patient sex. The association is driven primarily by dermatofibroma (female predominance) and vascular lesions (male predominance).
 
-**Test 2 -- dx vs localization (Chi-square):**
-A highly significant association was found between diagnosis type and body site (p < 0.001). This confirms that different lesion types have distinct anatomical preferences -- consistent with known pathophysiology.
+**Test 2: dx vs localization (Chi-square)**
+A highly significant association was found between diagnosis type and body site (p < 0.001). This confirms that different lesion types have distinct anatomical preferences, consistent with known pathophysiology.
 
-**Test 3 -- Age across dx groups (Kruskal-Wallis):**
+**Test 3: Age across dx groups (Kruskal-Wallis)**
 Median patient age differs significantly across diagnosis groups (p < 0.001). Malignant-like lesion groups have consistently higher median ages than benign groups, supporting the role of age as a risk factor.
 
-**Test 4 -- Melanoma age vs non-melanoma (Mann-Whitney U):**
+**Test 4: Melanoma age vs non-melanoma (Mann-Whitney U)**
 Melanoma patients are significantly older than non-melanoma patients (p < 0.001). This finding reinforces the clinical guidance to apply increased scrutiny to pigmented lesions in older patients.
 
 ### 5.6 Machine Learning Results
@@ -215,10 +215,10 @@ All three models were trained on metadata only (age, sex, localization) to class
 
 *Note: Exact values vary slightly per run due to random seeds. Values shown are representative ranges.*
 
-![Figure 9: Confusion Matrices - Melanoma vs. Non-Melanoma](figures/fig9_confusion_matrices.png)
-*Figure 9: Confusion Matrices - Melanoma vs. Non-Melanoma (All Models)*
+![Figure 9: Confusion Matrices: Melanoma vs. Non-Melanoma](figures/fig9_confusion_matrices.png)
+*Figure 9: Confusion Matrices: Melanoma vs. Non-Melanoma (All Models)*
 
-Melanoma recall in the 60-65% range -- achieved with only three simple features -- demonstrates that clinical metadata carries real screening signal. Feature importance analysis from the Random Forest shows that **age** is the most important predictor, followed by specific body localizations (particularly `back` and `scalp`).
+Melanoma recall in the 60-65% range, achieved with only three simple features, demonstrates that clinical metadata carries real screening signal. Feature importance analysis from the Random Forest shows that **age** is the most important predictor, followed by specific body localizations (particularly `back` and `scalp`).
 
 ![Figure 10: Top-15 Feature Importances (Random Forest)](figures/fig10_feature_importance.png)
 *Figure 10: Top-15 Feature Importances (Random Forest)*
@@ -276,7 +276,7 @@ The key findings are:
 - Patient **age, sex, and body localization are all significantly associated with lesion diagnosis type** (Chi-square: p < 0.001; Kruskal-Wallis: p < 0.001).
 - **Melanoma patients are significantly older** than non-melanoma patients (Mann-Whitney U: p < 0.001), with the 41-80 age range showing the highest malignant-like proportions.
 - Certain **body sites are strongly predictive of lesion type**: face and scalp for BCC and actinic keratosis, lower extremity for dermatofibroma, and back/trunk for melanoma.
-- **Metadata-only ML models can achieve melanoma recall of approximately 60-65%** using only three features -- demonstrating real but limited screening potential.
+- **Metadata-only ML models can achieve melanoma recall of approximately 60-65%** using only three features, demonstrating real but limited screening potential.
 - The dataset has significant **class imbalance** (nv = 67%) that must be managed in any modeling application.
 
 Clinical metadata captures biologically meaningful patterns in skin lesion data. While it cannot replace dermoscopic image analysis or clinical examination, understanding these patterns is valuable for building risk stratification frameworks, triaging referrals, and designing better screening programs. Future work should integrate image features with metadata for a more complete and clinically applicable model.
