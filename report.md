@@ -73,6 +73,12 @@ The dataset is heavily imbalanced. Melanocytic nevi (`nv`) account for approxima
 | vasc (Vascular Lesions) | 142 | 1.4% |
 | df (Dermatofibroma) | 115 | 1.1% |
 
+![Figure 1: Case Count per Diagnosis](figures/fig1_case_counts.png)
+*Figure 1: Case Count per Diagnosis*
+
+![Figure 7: Benign vs. Malignant-like Class Breakdown](figures/fig7_class_breakdown.png)
+*Figure 7: Benign vs. Malignant-like Class Breakdown*
+
 This class imbalance is a critical consideration for both statistical analysis and machine learning.
 
 ---
@@ -102,8 +108,7 @@ The following cleaning steps were applied before analysis:
 1. **Remove unknown sex rows:** 57 rows where `sex == "unknown"` were dropped.
 2. **Remove unknown localization rows:** 234 rows where `localization == "unknown"` were dropped.
 3. **Impute missing age values:** Missing `age` values were filled with the median age within each diagnosis group (`dx`), to preserve group-level age distributions.
-4. **Age binning:** Continuous age was discretized into five clinical groups:
-   - 0-20, 21-40, 41-60, 61-80, 80+
+4. **Age binning:** Continuous age was discretized into five clinical groups: 0-20, 21-40, 41-60, 61-80, 80+
 5. **Clinical grouping:** A binary `lesion_class` column was created:
    - **Benign:** `nv`, `bkl`, `df`, `vasc`
    - **Malignant-like:** `mel`, `bcc`, `akiec`
@@ -134,9 +139,7 @@ Four hypothesis tests were conducted:
 | 3 | Age vs dx group | Kruskal-Wallis H test |
 | 4 | Melanoma age vs non-melanoma age | Mann-Whitney U test |
 
-Significance level: alpha = 0.05 for all tests.
-
-Kruskal-Wallis and Mann-Whitney U were chosen over ANOVA because age data across diagnosis groups is not normally distributed.
+Significance level: alpha = 0.05 for all tests. Kruskal-Wallis and Mann-Whitney U were chosen over ANOVA because age data across diagnosis groups is not normally distributed.
 
 ### 4.4 Machine Learning (Metadata-Only)
 
@@ -146,32 +149,47 @@ A binary classification task was defined to predict **melanoma vs non-melanoma**
 - **Preprocessing:** StandardScaler for age; OneHotEncoder for sex and localization
 - **Models:** Logistic Regression, Decision Tree (max depth 5), Random Forest (100 trees)
 - **Class imbalance handling:** `class_weight='balanced'` applied to all models
-- **Evaluation metrics:** Accuracy, Precision, Recall, F1-score, Confusion Matrix
-
-The primary metric of interest is **Recall for the melanoma class**, because in a screening context, failing to detect a melanoma (false negative) carries a far higher clinical cost than a false alarm (false positive).
+- **Key metric:** Recall for the melanoma class -- failing to detect a melanoma carries far higher clinical cost than a false alarm
 
 ---
 
 ## 5. Results
 
-### 5.1 EDA Findings
+### 5.1 Age Patterns
 
-**Age distribution:**
 Malignant-like lesions (melanoma, BCC, actinic keratosis) are concentrated in older age groups. The median age for melanoma patients is notably higher than for melanocytic nevi patients. The 41-60 and 61-80 age bands show an increasing proportion of malignant-like cases. Dermatofibroma and vascular lesions tend to appear in younger patients on average.
 
-**Sex distribution:**
+![Figure 2: Age Distribution per Diagnosis](figures/fig2_age_by_diagnosis.png)
+*Figure 2: Age Distribution per Diagnosis (Box Plot)*
+
+![Figure 3: Benign vs. Malignant-like Proportion by Age Group](figures/fig3_malignant_by_age_group.png)
+*Figure 3: Benign vs. Malignant-like Proportion by Age Group*
+
+### 5.2 Sex Patterns
+
 Dermatofibroma shows a noticeably higher proportion in female patients, consistent with published literature. Vascular lesions and basal cell carcinoma show slight male predominance. Melanoma is distributed relatively evenly between sexes in this dataset.
 
-**Body localization:**
+![Figure 4: Sex Distribution Within Each Diagnosis](figures/fig4_diagnosis_by_sex.png)
+*Figure 4: Sex Distribution Within Each Diagnosis (%)*
+
+### 5.3 Body Localization Patterns
+
 The `back` and `lower extremity` are the most common overall sites. The heatmap reveals that melanoma has elevated proportions at the `back` and `trunk`, while actinic keratosis and BCC appear more frequently at the `face` and `scalp` -- sun-exposed regions consistent with UV-related etiology. Dermatofibroma is strongly associated with the `lower extremity`.
 
-**Confirmation method:**
+![Figure 5: Diagnosis Count by Top-7 Body Localizations](figures/fig5_diagnosis_by_location.png)
+*Figure 5: Diagnosis Count by Top-7 Body Localizations*
+
+![Figure 6: Heatmap - Diagnosis x Body Localization](figures/fig6_heatmap_dx_location.png)
+*Figure 6: Heatmap - Diagnosis x Body Localization (%)*
+
+### 5.4 Diagnosis Confirmation Method
+
 Melanoma and BCC have the highest proportion of histopathologic confirmation (`histo`), which is expected given their clinical severity. Melanocytic nevi are more frequently confirmed by follow-up, which is a standard approach for monitoring benign moles.
 
-**Class imbalance:**
-Melanocytic nevi represent 67% of the dataset. Any statistical result involving class distribution must account for this imbalance.
+![Figure 8: Diagnosis Confirmation Method per Diagnosis](figures/fig8_dxtype_by_diagnosis.png)
+*Figure 8: Diagnosis Confirmation Method per Diagnosis*
 
-### 5.2 Statistical Analysis Results
+### 5.5 Statistical Analysis Results
 
 **Test 1 -- dx vs sex (Chi-square):**
 The Chi-square test yielded a statistically significant result (p < 0.05), indicating that lesion type is significantly associated with patient sex. The association is driven primarily by dermatofibroma (female predominance) and vascular lesions (male predominance).
@@ -185,7 +203,7 @@ Median patient age differs significantly across diagnosis groups (p < 0.001). Ma
 **Test 4 -- Melanoma age vs non-melanoma (Mann-Whitney U):**
 Melanoma patients are significantly older than non-melanoma patients (p < 0.001). This finding reinforces the clinical guidance to apply increased scrutiny to pigmented lesions in older patients.
 
-### 5.3 Machine Learning Results
+### 5.6 Machine Learning Results
 
 All three models were trained on metadata only (age, sex, localization) to classify melanoma vs non-melanoma.
 
@@ -195,11 +213,15 @@ All three models were trained on metadata only (age, sex, localization) to class
 | Decision Tree (depth 5) | ~65-68% | ~0.55-0.62 | ~0.28-0.33 |
 | Random Forest | ~69-72% | ~0.60-0.65 | ~0.32-0.36 |
 
-*Note: Exact values will vary slightly per run due to random seeds. Values shown are representative ranges.*
+*Note: Exact values vary slightly per run due to random seeds. Values shown are representative ranges.*
+
+![Figure 9: Confusion Matrices - Melanoma vs. Non-Melanoma](figures/fig9_confusion_matrices.png)
+*Figure 9: Confusion Matrices - Melanoma vs. Non-Melanoma (All Models)*
 
 Melanoma recall in the 60-65% range -- achieved with only three simple features -- demonstrates that clinical metadata carries real screening signal. Feature importance analysis from the Random Forest shows that **age** is the most important predictor, followed by specific body localizations (particularly `back` and `scalp`).
 
-These results do not suggest that metadata is sufficient for clinical diagnosis. However, they confirm that demographic and anatomical factors are informative and could support triage or risk stratification decisions in a broader screening framework.
+![Figure 10: Top-15 Feature Importances (Random Forest)](figures/fig10_feature_importance.png)
+*Figure 10: Top-15 Feature Importances (Random Forest)*
 
 ---
 
@@ -215,14 +237,14 @@ The analysis confirms several patterns that are well-established in dermatology 
 
 - **Sex differences in lesion distribution are real but modest.** Dermatofibroma's female predominance is a well-documented observation. Broader sex differences are smaller and more complex than age or localization effects.
 
-- **Metadata carries meaningful screening signal.** Even with just three variables, models achieve melanoma recall in the 60-65% range. While this is insufficient for clinical diagnosis, it demonstrates that simple rule-based triage (e.g., "older patient + back lesion = refer for dermoscopic evaluation") has clinical basis.
+- **Metadata carries meaningful screening signal.** Even with just three variables, models achieve melanoma recall in the 60-65% range. While this is insufficient for clinical diagnosis, it demonstrates that simple rule-based triage has clinical basis.
 
 ### Class Imbalance Considerations
 
 The dominance of `nv` in the dataset (67%) has important implications:
 
 - Statistical tests may be driven by the majority class
-- ML models trained without balancing will default to predicting `non-melanoma` and achieve artificially high accuracy
+- ML models trained without balancing will default to predicting non-melanoma and achieve artificially high accuracy
 - Recall for the minority class (melanoma) is the meaningful performance indicator
 
 The use of `class_weight='balanced'` partially addresses this, but real-world deployment would require additional approaches such as oversampling (SMOTE) or threshold tuning.
@@ -235,15 +257,13 @@ The use of `class_weight='balanced'` partially addresses this, but real-world de
 
 2. **Metadata-only analysis:** This project deliberately excluded image data. Image features (color, texture, border irregularity) are the primary diagnostic signals in dermatoscopy. Metadata patterns are supplementary.
 
-3. **Curated dataset bias:** HAM10000 was collected in specialized dermatology research settings. It does not represent the full population of lesions seen in primary care, emergency, or telemedicine contexts. Generalization to real-world settings is limited.
+3. **Curated dataset bias:** HAM10000 was collected in specialized dermatology research settings. It does not represent the full population of lesions seen in primary care, emergency, or telemedicine contexts.
 
 4. **Age imputation:** Missing age values were imputed with per-group medians. This introduces mild bias, particularly for classes with small sample sizes.
 
-5. **Multiple lesion images:** Some lesions appear as multiple images in the dataset. This means the dataset is not fully independent at the image level. Analyses here are at the image level, not the lesion level.
+5. **Multiple lesion images:** Some lesions appear as multiple images in the dataset. Analyses here are at the image level, not the lesion level.
 
-6. **No image data used:** All ML models in this project are proof-of-concept demonstrations of metadata signal. They should not be interpreted as candidate diagnostic systems.
-
-7. **Academic use only:** All findings and models are produced for educational purposes and are not validated for clinical use.
+6. **Academic use only:** All findings and models are produced for educational purposes and are not validated for clinical use.
 
 ---
 
